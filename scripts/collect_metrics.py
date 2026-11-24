@@ -47,6 +47,28 @@ def _loc(path: Path) -> int:
 
 
 def _tree_hash() -> str:
+    """Hash the committed content of the repository.
+
+    The hash is built from the git object ids of the tracked files, so it does
+    not depend on the line ending convention of the checkout. The same commit
+    therefore produces the same tree hash on every machine.
+    """
+    listing = _run(["git", "ls-files", "-s"])
+    if listing.returncode == 0 and listing.stdout.strip():
+        digest = hashlib.sha256()
+        for line in sorted(listing.stdout.splitlines()):
+            parts = line.split()
+            if len(parts) < 3:
+                continue
+            blob = parts[1]
+            name = parts[3] if len(parts) > 3 else ""
+            if name in VOLATILE:
+                continue
+            digest.update(name.encode("utf-8"))
+            digest.update(b"\0")
+            digest.update(blob.encode("ascii"))
+            digest.update(b"\0")
+        return digest.hexdigest()
     digest = hashlib.sha256()
     for path in sorted(REPO_ROOT.rglob("*")):
         if not path.is_file():
