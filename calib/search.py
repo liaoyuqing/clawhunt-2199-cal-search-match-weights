@@ -173,6 +173,38 @@ def _neighbours(point: Point, step: int, cap: int) -> List[Point]:
     return result
 
 
+def _bfs_bridge(consider, start_point: Point, step: int, cap: int, max_bridge: int):
+    """Find the best feasible point within max_bridge unit moves of start_point.
+
+    An infeasible start with no feasible immediate neighbour still has to be
+    able to reach the feasible region: a breadth first walk crosses the
+    infeasible ring and returns the feasible point with the highest NDCG at the
+    shallowest distance where any feasible point appears. Every visited point
+    is recorded through `consider`, so the crossing points feed best_rejected.
+    """
+    seen = {start_point}
+    frontier = [start_point]
+    for _ in range(max(0, int(max_bridge))):
+        next_frontier = []
+        winners = []
+        for node in frontier:
+            for candidate in sorted(_neighbours(node, step, cap)):
+                if candidate in seen:
+                    continue
+                seen.add(candidate)
+                record = consider(candidate)
+                if record["passed"]:
+                    winners.append(record)
+                next_frontier.append(candidate)
+        if winners:
+            winners.sort(key=lambda item: (-float(item["ndcg"]), tuple(item["point"])))
+            return winners[0]
+        frontier = next_frontier
+        if not frontier:
+            break
+    return None
+
+
 def coordinate_ascent(
     evaluator: Evaluator,
     start_point: Point,
@@ -181,8 +213,14 @@ def coordinate_ascent(
     max_rounds: int = 50,
     step: int = 1,
     cap: int = space.CAP_UNITS,
+    max_bridge: int = 6,
 ) -> Dict[str, object]:
-    """Coordinate ascent on the NDCG objective, recording every point."""
+    """Coordinate ascent on the NDCG objective, recording every point.
+
+    The incumbent is always a feasible point: an infeasible start is bridged to
+    the nearest feasible region first, and an infeasible neighbour is never
+    accepted as an improvement.
+    """
     feasible: Dict[Point, Dict[str, object]] = {}
     rejected: Dict[Point, Dict[str, object]] = {}
 
@@ -207,22 +245,54 @@ def coordinate_ascent(
         return record
 
     position = tuple(int(v) for v in start_point)
-    best = consider(position)
+    start_record = consider(position)
+    # The incumbent of the ascent must be feasible. An infeasible start is kept
+    # in the rejected bucket as a best_rejected candidate, but it never becomes
+    # the incumbent: the walk first crosses to a feasible point.
+    best = None
+    if start_record["passed"]:
+        best = start_record
+    bridge = None
+    if best is None:
+        bridge = _bfs_bridge(consider, position, step, cap, max_bridge)
+        if bridge is not None:
+            best = bridge
     history = [
         {
             "round": 0,
             "point": list(position),
-            "weights": best["weights"],
-            "ndcg": best["ndcg"],
-            "feasible": best["passed"],
+            "weights": start_record["weights"],
+            "ndcg": start_record["ndcg"],
+            "feasible": start_record["passed"],
         }
     ]
+    if bridge is not None:
+        history.append(
+            {
+                "round": 0,
+                "point": list(bridge["point"]),
+                "weights": bridge["weights"],
+                "ndcg": bridge["ndcg"],
+                "feasible": True,
+                "bridged_from": list(position),
+            }
+        )
     for round_index in range(1, int(max_rounds) + 1):
+        if best is None:
+            break
+        anchor = best["point"]
+        incumbent = float(best["ndcg"])
         improved = False
-        for candidate in _neighbours(best["point"], step, cap):
+        for candidate in sorted(_neighbours(anchor, step, cap)):
             record = consider(candidate)
-            if record["ndcg"] > best["ndcg"] + _EPS:
+            # Only a point that satisfies all four constraints may become the
+            # incumbent, so an infeasible point can never be reported as the
+            # result of the ascent.
+            if not record["passed"]:
+                continue
+            if record["ndcg"] > incumbent + _EPS:
                 best = record
+                incumbent = float(record["ndcg"])
                 improved = True
         history.append(
             {
@@ -230,11 +300,15 @@ def coordinate_ascent(
                 "point": list(best["point"]),
                 "weights": best["weights"],
                 "ndcg": best["ndcg"],
-                "feasible": best["passed"],
+                "feasible": bool(best["passed"]),
             }
         )
         if not improved:
             break
+    if best is None:
+        # No feasible point was reachable from this start within max_bridge
+        # moves; the start only contributes to the rejected pool.
+        best = start_record
     return {
         "best_point": best["point"],
         "best_ndcg": best["ndcg"],

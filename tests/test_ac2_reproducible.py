@@ -13,7 +13,7 @@ import pytest
 from calib import constraints as gate
 from calib.data import load_current_weights, load_dataset
 from calib.run import main as run_main
-from calib.search import Evaluator, search_weights
+from calib.search import Evaluator, random_restarts, search_weights
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -60,3 +60,45 @@ def test_cli_runs_do_not_touch_the_current_weights_snapshot(tmp_path):
     before = weights_file.read_bytes()
     run_main(["--seed", "20261121", "--out-dir", str(tmp_path / "runs")])
     assert weights_file.read_bytes() == before
+
+def _point_set(seed: int):
+    dataset = load_dataset()
+    current_weights = load_current_weights()
+    evaluator = Evaluator(dataset, k=10)
+    current = evaluator.evaluate(current_weights)
+    thresholds = gate.derive_thresholds(current)
+    search = random_restarts(
+        evaluator, current_weights, thresholds, seed=seed, restarts=20
+    )
+    evaluated = set(search["feasible"]) | set(search["rejected"])
+    return [entry["weights"] for entry in search_weights(
+        evaluator, current_weights, thresholds, seed=seed, restarts=20
+    )["top5"]], evaluated
+
+
+def test_same_seed_evaluates_exactly_the_same_points():
+    """Reproducibility has two halves: same answer, and same work done.
+
+    Matching top 5 alone would also hold if the search blindly returned a
+    constant. Requiring the evaluated point set to match as well proves the
+    restart sequence is a deterministic function of the seed.
+    """
+    _, first = _point_set(20261121)
+    _, second = _point_set(20261121)
+    assert first == second
+    assert len(first) > 20
+
+
+def test_different_seeds_do_explore_different_points():
+    """A different seed walks a different part of the grid.
+
+    The NDCG surface on this fixture has a single local maximum (see
+    reports/ndcg_surface.md), so both seeds land on the same top 5. What still
+    differs is the set of points the ascent visited, which is the observable
+    proof that the random restarts are actually random and seed controlled.
+    """
+    top_a, points_a = _point_set(20261121)
+    top_b, points_b = _point_set(7)
+    assert top_a == top_b
+    assert points_a != points_b
+    assert points_a | points_b != points_a

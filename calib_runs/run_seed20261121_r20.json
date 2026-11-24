@@ -175,13 +175,13 @@
     "new_share_std": 0.009282241108697842
   },
   "cv_weights_source": "top1",
-  "evaluated_points": 375,
-  "feasible_points": 200,
+  "evaluated_points": 430,
+  "feasible_points": 205,
   "generated_at": "2026-11-24T00:00:00+08:00",
   "generated_at_note": "fixed string so that two runs with the same seed give byte identical files",
   "k": 10,
   "online_weights_written": false,
-  "rejected_points": 175,
+  "rejected_points": 225,
   "restarts": 20,
   "run_id": "run_seed20261121_r20",
   "search_space": {

@@ -7,6 +7,26 @@
 > 全部数据均为虚构夹具（`fixtures/`），不含任何真实客户名称、商品名称或个人信息；
 > 本仓库不会写回线上权重，也不向任何外部服务发送数据。
 
+## 0. 与提案中「2751 个合法点」的差异
+
+早期提案里写过「权重点空间合法点数 2751」。用交付代码复算，这个数字不成立：
+在「每项 0~0.5、步长 0.05、合计恰为 1」的口径下，无论取几个分项都得不到 2751。
+
+| 分项数 k | 合计恰为 1.0（20 单位） | 合计 ≤ 1.0（≤ 20 单位） |
+| --- | --- | --- |
+| 3 | 66 | 1111 |
+| 4 | **891** | **7766** |
+| 5 | 7051 | 43120 |
+
+推导：权重以 0.05 为单位，每项落在 `0..10` 且合计为 `20`，合法点数就是
+「k 个 0..10 的整数和为 20」的解数，用滚动数组 DP 求得、并与 `itertools.product`
+暴力枚举逐项核对一致。`tests/test_search_space_and_metrics.py:10`
+（`test_search_space_counts_match_the_reference_numbers`）把 66 / 891 / 7051 与
+1111 / 7766 / 43120 六个值全部断言住，任何一个数字写错都会让用例失败。
+
+需求与提案冲突时以需求与验收为准，因此本交付按 **k = 4、合计恰为 1 的 891 个点**
+执行；`reports/metrics.json` 的 `search_space` 字段与该结论一致。
+
 ## 1. 一句话口径与两个必要假设
 
 工单原文没有写死「匹配特征分项数」，本实现按 **k = 4 个匹配特征分项**落地
@@ -71,10 +91,23 @@ python -m venv .venv
 2. `calib/search.py::random_restarts` 用 `np.random.default_rng(seed)` 在这些点里
    抽 20 个互不相同的起点（外加当前权重所在点作为一次起点）；
 3. `calib/search.py::coordinate_ascent` 从每个起点出发，每轮枚举「单位转移」
-   邻居，取 NDCG 最高的点前进，无改进即停（最多 50 轮）；
-4. 搜索过程中**每一个被约束淘汰的点都被记录**，最终 NDCG 最高的那个成为
+   邻居，取 **NDCG 最高且合规** 的点前进，无改进即停（最多 50 轮）；
+4. incumbent **只能是合规点**：起点本身不可行时，先用 BFS 跨到最近的合规点
+   （`_bfs_bridge`，最多 6 步），再从那里开始上升；不可行的邻居一律不更新 incumbent，
+   因此上升的返回值永远是合规点；
+5. 搜索过程中**每一个被约束淘汰的点都被记录**，最终 NDCG 最高的那个成为
    `best_rejected`；
-5. `top5` **只收合规点**，按 NDCG 降序。
+6. `top5` **只收合规点**，按 NDCG 降序。
+
+第 4 条不是可有可无的保守设定：891 个合法点里有 **569** 个不满足四项约束，其中
+**159** 个的一步邻居里一个合规点都没有——对这类起点，不先跨界就只可能在不可行区域里走。
+`tests/test_ascent_invariants.py:78` 对全部 891 个起点逐个断言返回点合规；`:103` 用
+桩评估器断言「全局最优恰好不可行」时上升会放弃它；`:136` 是正对照，证明这个守卫不会
+把上升冻在起点。
+
+需要说明的是：在**本夹具**上，即使把可行性判断去掉，891 个起点也都会落在合规点，
+因为曲面唯一的局部极大值恰好合规（见第 11 节）。所以只看真实数据的用例区分不了
+「校验了合规」与「碰巧合规」，`:103` 的桩用例才是真正的判别性证据。
 
 `best_rejected` 与 `top5` 不会重叠（`search_weights` 里有断言），
 `best_rejected` 带 `rejected_reason`（有序约束名）、`rejected_reason_text`（中文可读
@@ -136,15 +169,34 @@ calib/
 scripts/
   make_fixtures.py    生成虚构夹具（幂等）
   collect_metrics.py  采集实测数字到 reports/metrics.json
+  ndcg_surface.py     穷举 891 点，输出 NDCG 曲面与局部极大值个数
   secret_scan.py      工作树与 git 历史的密钥扫描
-tests/                验收断言与单元测试
+tests/                验收断言与单元测试（44 条）
 fixtures/             虚构夹具（只读）
+reports/              metrics.json、ndcg_surface.md、pytest_output.txt
 calib_runs/           校准运行记录（只写这里）
 ```
 
+代码量（非空行，由 `scripts/collect_metrics.py` 现算并写进 `reports/metrics.json`，
+下表是形如 `package_loc` / `script_loc` / `test_loc` 的字段名，实际数值以 JSON 为准）：
+
+| 目录 | 文件数 | 字段 | 说明 |
+| --- | --- | --- | --- |
+| `calib/` | `package_py_files` | `package_loc` | 9 个模块 + `__init__.py` |
+| `scripts/` | `script_files` | `script_loc` | `make_fixtures` / `collect_metrics` / `ndcg_surface` / `secret_scan` |
+| `tests/` | `test_files` | `test_loc` | 7 个文件共 `collected_tests` 条用例 |
+
+脚本行数在 `f1a6f95` 时是 415 行；本轮新增 `scripts/ndcg_surface.py`（曲面穷举证据）
+并重写了 `scripts/secret_scan.py`（区分「未扫描」与「扫描干净」），因此当前实测值更大。
+任何一处改动后重跑 `python scripts/collect_metrics.py` 即可同步，README 不另写死数字。
+
 ## 11. 已知边界
 
-- 搜索是局部启发式的（坐标上升），不保证全局最优；本仓库报告的是「搜索到的最优」；
+- 搜索是局部启发式的（坐标上升），理论上不保证全局最优；本仓库报告的是「搜索到的最优」；
+- 在**本夹具**上曲面实际上只有一个局部极大值：`scripts/ndcg_surface.py` 穷举 891 个
+  合法点，`local_maxima 1`，坐标 `[9, 4, 4, 3]`（NDCG 0.978106），次大值 0.976560，
+  891 个取值两两不同。因此换随机种子得到的 top5 相同是数据性质，不是搜索退化；
+  能证明重启真实生效的是被评估点集（不同种子点集不同，见 `reports/ndcg_surface.md`）；
 - 基尼系数用「曝光次数」计算，若商品目录不跨卡复用，该指标会退化（见第 1 节）；
 - 夹具是虚构数据，真实分布下四项阈值需要按线上当前指标重新推导；
 - `rel` 标签由夹具生成器的四分位切分产生，生产环境应使用真实反馈标签。
