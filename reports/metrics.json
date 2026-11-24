@@ -72,10 +72,10 @@
   "pytest_exit_code": 0,
   "python_version": "3.11.9",
   "script_files": 3,
-  "script_loc": 394,
+  "script_loc": 415,
   "test_cases": 36,
   "test_files": 5,
   "test_loc": 285,
-  "tracked_files": 28,
-  "tree_sha256": "f108d558ab08040c56ec717384aa9e5809dd560a724739bc9b037419ff36b2d1"
+  "tracked_files": 29,
+  "tree_sha256": "a00bc6d53a3628ce99b76fb49bcae32e539ce80d3ad45f8917308934cb100524"
 }
