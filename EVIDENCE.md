@@ -14,12 +14,13 @@
 | 附加：坐标上升只接受合规点 | `python -m pytest -o addopts= -q tests/test_ascent_invariants.py` | 3 passed | `tests/test_ascent_invariants.py` | `tests/test_ascent_invariants.py:78` |
 | 附加：密钥扫描在无 .git 时必须失败而非假绿 | `python -m pytest -o addopts= -q tests/test_secret_scan_guard.py` | 3 passed | `tests/test_secret_scan_guard.py` | `tests/test_secret_scan_guard.py:48` |
 | 附加：全量用例 | `python -m pytest -o addopts= -q` | 44 passed；末行见 `reports/pytest_output.txt` | `reports/pytest_output.txt` | `reports/metrics.json` 的 `test_cases` / `collected_tests` 字段 |
-| 附加：命令行输出与运行记录 | `python -m calib.run --seed 20261121 --restarts 20` | 写出 `calib_runs/run_seed20261121_r20.json` | `calib_runs/run_seed20261121_r20.json` | `calib/run.py:104` |
+| 附加：命令行输出与运行记录 | `python -m calib.run --seed 20261121 --restarts 20` | 写出 `calib_runs/run_seed20261121_r20.json` | `calib_runs/run_seed20261121_r20.json` | `calib/run.py:100` |
 | 附加：同种子重复运行文件逐字节一致 | `python -m pytest -o addopts= -q tests/test_ac2_reproducible.py::test_two_cli_runs_write_byte_identical_files` | 1 passed | `tests/test_ac2_reproducible.py` | `tests/test_ac2_reproducible.py:46` |
+| 附加：运行不改线上权重快照 | `python -m pytest -o addopts= -q tests/test_ac2_reproducible.py::test_cli_runs_do_not_touch_the_current_weights_snapshot` | 1 passed | `tests/test_ac2_reproducible.py` | `tests/test_ac2_reproducible.py:58` |
 | 附加：同种子被评估点集完全相同 | `python -m pytest -o addopts= -q tests/test_ac2_reproducible.py::test_same_seed_evaluates_exactly_the_same_points` | 1 passed | `tests/test_ac2_reproducible.py` | `tests/test_ac2_reproducible.py:79` |
 | 附加：不同种子的被评估点集不同 | `python -m pytest -o addopts= -q tests/test_ac2_reproducible.py::test_different_seeds_do_explore_different_points` | 1 passed | `tests/test_ac2_reproducible.py` | `tests/test_ac2_reproducible.py:92` |
-| 附加：NDCG 曲面穷举（局部极大值个数） | `python scripts/ndcg_surface.py` | `local_maxima 1` | `reports/ndcg_surface.md` | `scripts/ndcg_surface.py:45` |
-| 附加：实测数字汇总 | `python scripts/collect_metrics.py` | 打印 13 项指标 + 每个 run 一行 | `reports/metrics.json` | `scripts/collect_metrics.py:198` |
+| 附加：NDCG 曲面穷举（局部极大值个数） | `python scripts/ndcg_surface.py` | `local_maxima 1` | `reports/ndcg_surface.md` | `scripts/ndcg_surface.py:54` |
+| 附加：实测数字汇总 | `python scripts/collect_metrics.py` | 打印 13 项指标 + 每个 run 一行 | `reports/metrics.json` | `scripts/collect_metrics.py:179` |
 | 附加：密钥扫描 | `python scripts/secret_scan.py` | `tree_hits 0`、`history_hits 0`、`history_scanned yes` | `reports/metrics.json` | `scripts/secret_scan.py:96` |
 
 ## AC1 的具体断言
@@ -32,7 +33,7 @@
 
 ## AC2 的具体断言
 
-`tests/test_ac2_reproducible.py` 里五件事：
+`tests/test_ac2_reproducible.py` 里六件事：
 
 1. `:33` `test_same_seed_gives_the_same_top5_weights`：同一 seed 两次搜索，`top5` 的
    权重与 NDCG 逐项相等；
@@ -43,7 +44,10 @@
 4. `:79` `test_same_seed_evaluates_exactly_the_same_points`：同一 seed 两次运行**被评估
    点集完全相同**（不止 top 5 相同）；
 5. `:92` `test_different_seeds_do_explore_different_points`：不同 seed 的 `top5` 相同、
-   但**被评估点集不同**。
+   但**被评估点集不同**；
+6. `:58` `test_cli_runs_do_not_touch_the_current_weights_snapshot`：命令行运行前后
+   `fixtures/current_weights.json` 的 mtime 与 sha256 不变，且运行记录里
+   `online_weights_written` 为 `false`。
 
 第 4、5 条是必要的：如果只断言 top 5 相同，一个恒定返回同一答案的搜索也能通过。
 而「不同 seed 收敛到同一 top5」是这个夹具的数据性质而非搜索退化——
@@ -71,7 +75,6 @@ seed 7 是 482 个点，与 seed 20261121 的对称差为 268。
 也都会落在合规点，因为曲面唯一的局部极大值恰好合规。只看真实数据的 `:78` 无法
 区分「校验了合规」与「碰巧合规」。反方向也一样：只加守卫、不加跨界，891 个起点里
 有 569 个会卡在不可行起点上——守卫与跨界必须同时存在，因此三条用例缺一不可。
-因为曲面唯一的局部极大值恰好合规——所以只有 `:103` 的桩用例能区分两种行为。
 
 ## 端到端自检
 
