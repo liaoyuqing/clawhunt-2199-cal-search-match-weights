@@ -100,6 +100,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     out_path.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True),
         encoding="utf-8",
+        newline="\n",
     )
     print("seed", args.seed)
     print("restarts", args.restarts)

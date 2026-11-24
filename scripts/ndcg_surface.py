@@ -206,7 +206,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             target = REPO_ROOT / target
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(
-            render(points, values, feasible, maxima, measured), encoding="utf-8"
+            render(points, values, feasible, maxima, measured),
+            encoding="utf-8",
+            newline="\n",
         )
         print("markdown", target.relative_to(REPO_ROOT).as_posix())
     return 0
