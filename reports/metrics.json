@@ -1,0 +1,81 @@
+{
+  "calib_runs": [
+    {
+      "best_rejected_reason": [
+        "item_delta"
+      ],
+      "best_rejected_weights": [
+        0.5,
+        0.2,
+        0.15,
+        0.15
+      ],
+      "cv_ndcg_mean": 0.9781063151532964,
+      "cv_ndcg_std": 0.001847247925024398,
+      "evaluated_points": 375,
+      "feasible_points": 200,
+      "online_weights_written": false,
+      "rejected_points": 175,
+      "restarts": 20,
+      "run_id": "run_seed20261121_r20",
+      "seed": 20261121,
+      "top1_ndcg": 0.9781063151532965,
+      "top1_weights": [
+        0.45,
+        0.2,
+        0.2,
+        0.15
+      ]
+    },
+    {
+      "best_rejected_reason": [
+        "item_delta"
+      ],
+      "best_rejected_weights": [
+        0.5,
+        0.2,
+        0.15,
+        0.15
+      ],
+      "cv_ndcg_mean": 0.9781063151532964,
+      "cv_ndcg_std": 0.001847247925024398,
+      "evaluated_points": 362,
+      "feasible_points": 184,
+      "online_weights_written": false,
+      "rejected_points": 178,
+      "restarts": 20,
+      "run_id": "run_seed7_r20",
+      "seed": 7,
+      "top1_ndcg": 0.9781063151532965,
+      "top1_weights": [
+        0.45,
+        0.2,
+        0.2,
+        0.15
+      ]
+    }
+  ],
+  "collected_tests": 36,
+  "fixture_candidates": 10000,
+  "fixture_cards": 500,
+  "fixture_current_weights": [
+    0.25,
+    0.25,
+    0.25,
+    0.25
+  ],
+  "fixture_distinct_items": 4472,
+  "fixture_groups": 10,
+  "online_weights_written": false,
+  "package_loc": 1129,
+  "package_py_files": 10,
+  "pytest_exit_code": 0,
+  "python_version": "3.11.9",
+  "script_files": 3,
+  "script_loc": 394,
+  "test_cases": 36,
+  "test_files": 5,
+  "test_loc": 285,
+  "tracked_files": 0,
+  "tree_sha256": "88dcc77ffb9f850c17ea321e692bb285e9ba8ea86d37b85a6df1bc5c80a849e9"
+}

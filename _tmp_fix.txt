@@ -1,0 +1,8 @@
+﻿demand cards         : 500
+candidates           : 10000
+groups               : 10 (g-01 .. g-10)
+distinct items       : 4472
+has_supply == true   : 5903
+is_new_member == true: 2481
+cards written to     : E:\AI�ӵ�\Clawhunt-2\delivery\deliverables\2199\fixtures\demand_cards_500.jsonl
+weights written to   : E:\AI�ӵ�\Clawhunt-2\delivery\deliverables\2199\fixtures\current_weights.json

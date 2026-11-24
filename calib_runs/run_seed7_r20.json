@@ -1,0 +1,335 @@
+{
+  "best_rejected": {
+    "excess_total": 0.04999999999999999,
+    "metrics": {
+      "coverage": 0.854,
+      "gini": 0.7354280858676208,
+      "max_delta": 0.25,
+      "new_share": 0.2504
+    },
+    "ndcg": 0.9765602824578472,
+    "point": [
+      10,
+      4,
+      3,
+      3
+    ],
+    "rejected_reason": [
+      "item_delta"
+    ],
+    "rejected_reason_text": "违反约束：item_delta 实测 0.250000，限值 0.200000，超出 0.050000",
+    "violations": [
+      {
+        "constraint": "item_delta",
+        "excess": 0.04999999999999999,
+        "limit": 0.2,
+        "value": 0.25
+      }
+    ],
+    "weights": [
+      0.5,
+      0.2,
+      0.15,
+      0.15
+    ]
+  },
+  "current_metrics": {
+    "coverage": 0.858,
+    "gini": 0.7247079606440071,
+    "n_cards": 500,
+    "n_slots": 5000,
+    "ndcg_mean": 0.9147155711566948,
+    "new_share": 0.2464
+  },
+  "cv": {
+    "coverage_mean": 0.852,
+    "coverage_std": 0.02039607805437116,
+    "folds": [
+      {
+        "coverage": 0.83,
+        "fold": 1,
+        "gini": 0.6545746478873239,
+        "n_cards": 100,
+        "n_train_cards": 400,
+        "ndcg": 0.9808006980907222,
+        "new_share": 0.253,
+        "test_groups": [
+          "g-01",
+          "g-02"
+        ],
+        "train_groups": [
+          "g-03",
+          "g-04",
+          "g-05",
+          "g-06",
+          "g-07",
+          "g-08",
+          "g-09",
+          "g-10"
+        ],
+        "train_ndcg": 0.9774327194189399
+      },
+      {
+        "coverage": 0.85,
+        "fold": 2,
+        "gini": 0.6555608351331893,
+        "n_cards": 100,
+        "n_train_cards": 400,
+        "ndcg": 0.9769473894709683,
+        "new_share": 0.25,
+        "test_groups": [
+          "g-03",
+          "g-04"
+        ],
+        "train_groups": [
+          "g-01",
+          "g-02",
+          "g-05",
+          "g-06",
+          "g-07",
+          "g-08",
+          "g-09",
+          "g-10"
+        ],
+        "train_ndcg": 0.9783960465738784
+      },
+      {
+        "coverage": 0.88,
+        "fold": 3,
+        "gini": 0.6577639575971731,
+        "n_cards": 100,
+        "n_train_cards": 400,
+        "ndcg": 0.9794830915038673,
+        "new_share": 0.236,
+        "test_groups": [
+          "g-05",
+          "g-06"
+        ],
+        "train_groups": [
+          "g-01",
+          "g-02",
+          "g-03",
+          "g-04",
+          "g-07",
+          "g-08",
+          "g-09",
+          "g-10"
+        ],
+        "train_ndcg": 0.9777621210656536
+      },
+      {
+        "coverage": 0.83,
+        "fold": 4,
+        "gini": 0.661856093979442,
+        "n_cards": 100,
+        "n_train_cards": 400,
+        "ndcg": 0.9777278696652418,
+        "new_share": 0.236,
+        "test_groups": [
+          "g-07",
+          "g-08"
+        ],
+        "train_groups": [
+          "g-01",
+          "g-02",
+          "g-03",
+          "g-04",
+          "g-05",
+          "g-06",
+          "g-09",
+          "g-10"
+        ],
+        "train_ndcg": 0.97820092652531
+      },
+      {
+        "coverage": 0.87,
+        "fold": 5,
+        "gini": 0.6478714285714285,
+        "n_cards": 100,
+        "n_train_cards": 400,
+        "ndcg": 0.9755725270356821,
+        "new_share": 0.259,
+        "test_groups": [
+          "g-09",
+          "g-10"
+        ],
+        "train_groups": [
+          "g-01",
+          "g-02",
+          "g-03",
+          "g-04",
+          "g-05",
+          "g-06",
+          "g-07",
+          "g-08"
+        ],
+        "train_ndcg": 0.9787397621827
+      }
+    ],
+    "gini_mean": 0.6555253926337115,
+    "gini_std": 0.004573342109108912,
+    "n_splits": 5,
+    "ndcg_mean": 0.9781063151532964,
+    "ndcg_std": 0.001847247925024398,
+    "new_share_mean": 0.2468,
+    "new_share_std": 0.009282241108697842
+  },
+  "cv_weights_source": "top1",
+  "evaluated_points": 362,
+  "feasible_points": 184,
+  "generated_at": "2026-11-24T00:00:00+08:00",
+  "generated_at_note": "fixed string so that two runs with the same seed give byte identical files",
+  "k": 10,
+  "online_weights_written": false,
+  "rejected_points": 178,
+  "restarts": 20,
+  "run_id": "run_seed7_r20",
+  "search_space": {
+    "cap_units": 10,
+    "exact_points": 891,
+    "k": 4,
+    "le_points": 7766,
+    "step": 0.05,
+    "total_units": 20
+  },
+  "seed": 7,
+  "thresholds": {
+    "coverage_min": 0.8079999999999999,
+    "gini_max": 0.7747079606440072,
+    "item_delta_max": 0.2,
+    "new_share_min": 0.2464
+  },
+  "top5": [
+    {
+      "coverage": 0.852,
+      "diff_vs_current": [
+        0.2,
+        -0.05,
+        -0.05,
+        -0.1
+      ],
+      "gini": 0.7328770125223614,
+      "max_delta": 0.2,
+      "ndcg": 0.9781063151532965,
+      "new_share": 0.2468,
+      "point": [
+        9,
+        4,
+        4,
+        3
+      ],
+      "weights": [
+        0.45,
+        0.2,
+        0.2,
+        0.15
+      ]
+    },
+    {
+      "coverage": 0.854,
+      "diff_vs_current": [
+        0.2,
+        0.0,
+        -0.1,
+        -0.1
+      ],
+      "gini": 0.7298859570661896,
+      "max_delta": 0.2,
+      "ndcg": 0.9763567906129486,
+      "new_share": 0.2496,
+      "point": [
+        9,
+        5,
+        3,
+        3
+      ],
+      "weights": [
+        0.45,
+        0.25,
+        0.15,
+        0.15
+      ]
+    },
+    {
+      "coverage": 0.856,
+      "diff_vs_current": [
+        0.2,
+        -0.05,
+        -0.1,
+        -0.05
+      ],
+      "gini": 0.7306161001788909,
+      "max_delta": 0.2,
+      "ndcg": 0.9754428890588794,
+      "new_share": 0.2494,
+      "point": [
+        9,
+        4,
+        3,
+        4
+      ],
+      "weights": [
+        0.45,
+        0.2,
+        0.15,
+        0.2
+      ]
+    },
+    {
+      "coverage": 0.854,
+      "diff_vs_current": [
+        0.2,
+        0.0,
+        -0.05,
+        -0.15
+      ],
+      "gini": 0.7323382826475849,
+      "max_delta": 0.2,
+      "ndcg": 0.9739619096538934,
+      "new_share": 0.2476,
+      "point": [
+        9,
+        5,
+        4,
+        2
+      ],
+      "weights": [
+        0.45,
+        0.25,
+        0.2,
+        0.1
+      ]
+    },
+    {
+      "coverage": 0.852,
+      "diff_vs_current": [
+        0.15,
+        0.0,
+        -0.05,
+        -0.1
+      ],
+      "gini": 0.7262546511627906,
+      "max_delta": 0.15,
+      "ndcg": 0.9727864315752374,
+      "new_share": 0.2494,
+      "point": [
+        8,
+        5,
+        4,
+        3
+      ],
+      "weights": [
+        0.4,
+        0.25,
+        0.2,
+        0.15
+      ]
+    }
+  ],
+  "weights_current": [
+    0.25,
+    0.25,
+    0.25,
+    0.25
+  ]
+}

@@ -1,0 +1,17 @@
+﻿seed 7
+restarts 20
+evaluated_points 362
+feasible_points 184
+rejected_points 178
+top5
+  1 weights=[0.45, 0.2, 0.2, 0.15] ndcg=0.978106 coverage=0.852000 gini=0.732877 new_share=0.246800 max_delta=0.200000
+  2 weights=[0.45, 0.25, 0.15, 0.15] ndcg=0.976357 coverage=0.854000 gini=0.729886 new_share=0.249600 max_delta=0.200000
+  3 weights=[0.45, 0.2, 0.15, 0.2] ndcg=0.975443 coverage=0.856000 gini=0.730616 new_share=0.249400 max_delta=0.200000
+  4 weights=[0.45, 0.25, 0.2, 0.1] ndcg=0.973962 coverage=0.854000 gini=0.732338 new_share=0.247600 max_delta=0.200000
+  5 weights=[0.4, 0.25, 0.2, 0.15] ndcg=0.972786 coverage=0.852000 gini=0.726255 new_share=0.249400 max_delta=0.150000
+best_rejected [0.5, 0.2, 0.15, 0.15] ndcg 0.97656
+best_rejected_reason item_delta
+best_rejected_excess_total 0.05
+cv_ndcg_mean 0.978106
+cv_ndcg_std 0.001847
+output calib_runs/run_seed7_r20.json

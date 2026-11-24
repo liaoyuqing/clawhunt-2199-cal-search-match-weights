@@ -1,0 +1,16 @@
+﻿python_version 3.11.9
+package_py_files 10
+package_loc 1129
+test_files 5
+test_cases 36
+collected_tests 36
+pytest_exit_code 0
+fixture_cards 500
+fixture_candidates 10000
+fixture_groups 10
+fixture_distinct_items 4472
+tracked_files 0
+tree_sha256 88dcc77ffb9f850c17ea321e692bb285e9ba8ea86d37b85a6df1bc5c80a849e9
+run run_seed20261121_r20 seed 20261121 restarts 20 evaluated_points 375 top1 [0.45, 0.2, 0.2, 0.15] ndcg 0.9781063151532965
+run run_seed7_r20 seed 7 restarts 20 evaluated_points 362 top1 [0.45, 0.2, 0.2, 0.15] ndcg 0.9781063151532965
+metrics reports/metrics.json
